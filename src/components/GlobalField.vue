@@ -5,15 +5,23 @@ export default {
     return {
       isBomb: [],
       isField: [],
+      isClicked: [],
+
+      gameOver: false,
     };
   },
   props: {
     fieldSize: Number,
   },
   methods: {
+    findField(array, location) {
+      return array.some(
+        (field) => field.x === location.x && field.y === location.y
+      );
+    },
     randomizeFields() {
-      for (let i = 0; i < this.fieldSize; i++) {
-        for (let j = 0; j < this.fieldSize; j++) {
+      for (let i = 1; i <= this.fieldSize; i++) {
+        for (let j = 1; j <= this.fieldSize; j++) {
           const result = Math.random() < 0.5;
           const location = { x: j, y: i };
           result ? this.isBomb.push(location) : this.isField.push(location);
@@ -21,14 +29,14 @@ export default {
       }
     },
     clickField(location) {
-      if (
-        this.isBomb.some(
-          (bomb) => bomb.x === location.x && bomb.y === location.y
-        )
-      ) {
-        return alert("KABOOM");
+      if (this.findField(this.isBomb, location)) {
+        this.gameOver = true;
+        alert("KABOOM");
+      } else {
+        !this.findField(this.isClicked, location)
+          ? this.isClicked.push(location)
+          : console.log("tu ja clicou ai krl");
       }
-      alert("nao explodiu :D");
     },
   },
   mounted() {
@@ -50,7 +58,9 @@ export default {
         v-for="block in fieldSize"
         :key="`${block}-${line}`"
         @click="clickField({ x: block, y: line })"
-      ></td>
+      >
+        <span v-if="findField(isClicked, { x: block, y: line })"></span>
+      </td>
     </tr>
   </table>
 </template>

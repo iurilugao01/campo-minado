@@ -10,7 +10,7 @@ export default {
 </script>
 
 <template>
-  <GlobalField :fieldSize="10"></GlobalField>
+  <GlobalField :fieldSize="4"></GlobalField>
 </template>
 
 <style>
