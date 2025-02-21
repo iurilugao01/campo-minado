@@ -1,13 +1,13 @@
 <script>
 export default {
-  name: "GlobalField",
+  name: "MineField",
   data() {
     return {
       isBomb: [],
       isField: [],
       isClicked: [],
 
-      gameOver: false,
+      markBanner: false,
     };
   },
   props: {
@@ -29,16 +29,26 @@ export default {
       }
     },
     clickField(location) {
+      if (this.markBanner) {
+        !this.findField(this.isClicked, location)
+          ? this.isClicked.push(location)
+          : console.log("armazenado");
+
+        return;
+      }
       if (this.findField(this.isBomb, location)) {
-        this.gameOver = true;
         alert("KABOOM");
+        window.location.reload();
       } else {
         !this.findField(this.isClicked, location)
           ? this.isClicked.push(location)
-          : console.log("tu ja clicou ai krl");
+          : console.log("armazenado");
       }
     },
     showNearBombs(location) {
+      if (this.markBanner) {
+        return "!";
+      }
       const nearFields = [];
       let nearBombs = 0;
 
@@ -60,7 +70,6 @@ export default {
       return nearBombs;
     },
   },
-
   mounted() {
     this.randomizeFields();
     console.log(this.isBomb);
@@ -71,7 +80,7 @@ export default {
 <template>
   <table>
     <tr>
-      <th>0</th>
+      <th @click="markBanner = !markBanner">!</th>
       <th v-for="header in fieldSize" :key="header">{{ header }}</th>
     </tr>
     <tr v-for="line in fieldSize" :key="line">

@@ -1,16 +1,16 @@
 <script>
-import GlobalField from "./components/GlobalField.vue";
+import MineField from "./components/MineField.vue";
 
 export default {
   name: "App",
   components: {
-    GlobalField,
+    MineField,
   },
 };
 </script>
 
 <template>
-  <GlobalField :fieldSize="4"></GlobalField>
+  <MineField :fieldSize="4"></MineField>
 </template>
 
 <style>
