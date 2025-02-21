@@ -38,7 +38,29 @@ export default {
           : console.log("tu ja clicou ai krl");
       }
     },
+    showNearBombs(location) {
+      const nearFields = [];
+      let nearBombs = 0;
+
+      nearFields.push(
+        { x: location.x, y: location.y + 1 },
+        { x: location.x + 1, y: location.y + 1 },
+        { x: location.x + 1, y: location.y },
+        { x: location.x + 1, y: location.y - 1 },
+        { x: location.x, y: location.y - 1 },
+        { x: location.x - 1, y: location.y - 1 },
+        { x: location.x - 1, y: location.y },
+        { x: location.x - 1, y: location.y + 1 }
+      );
+      nearFields.forEach((el) => {
+        if (this.findField(this.isBomb, el)) {
+          nearBombs++;
+        }
+      });
+      return nearBombs;
+    },
   },
+
   mounted() {
     this.randomizeFields();
     console.log(this.isBomb);
@@ -59,7 +81,9 @@ export default {
         :key="`${block}-${line}`"
         @click="clickField({ x: block, y: line })"
       >
-        <span v-if="findField(isClicked, { x: block, y: line })"></span>
+        <span v-if="findField(isClicked, { x: block, y: line })">
+          {{ showNearBombs({ x: block, y: line }) }}
+        </span>
       </td>
     </tr>
   </table>
@@ -88,5 +112,6 @@ th {
 
 td {
   background-color: #0e0e0e;
+  text-align: center;
 }
 </style>
