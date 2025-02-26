@@ -1,58 +1,59 @@
 <script>
+import { ref, onMounted } from "vue";
+
 export default {
   name: "MineField",
-  data() {
-    return {
-      isBomb: [],
-      isField: [],
-      isClicked: [],
-
-      markBanner: false,
-    };
-  },
   props: {
     fieldSize: Number,
   },
-  methods: {
-    findField(array, location) {
+  setup(props) {
+    const isBomb = ref([]);
+    const isField = ref([]);
+    const isClicked = ref([]);
+    let markBanner = false;
+
+    const findField = (array, location) => {
       return array.some(
         (field) => field.x === location.x && field.y === location.y
       );
-    },
-    randomizeFields() {
-      for (let i = 1; i <= this.fieldSize; i++) {
-        for (let j = 1; j <= this.fieldSize; j++) {
+    };
+
+    const randomizeFields = () => {
+      for (let i = 1; i <= props.fieldSize; i++) {
+        for (let j = 1; j <= props.fieldSize; j++) {
           const result = Math.random() < 0.5;
           const location = { x: j, y: i };
-          result ? this.isBomb.push(location) : this.isField.push(location);
+          result ? isBomb.value.push(location) : isField.value.push(location);
         }
       }
-    },
-    clickField(location) {
-      if (this.markBanner) {
-        !this.findField(this.isClicked, location)
-          ? this.isClicked.push(location)
-          : console.log("armazenado");
+    };
 
+    const clickField = (location) => {
+      if (markBanner) {
+        if (!findField(isClicked.value, location)) {
+          isClicked.value.push(location);
+        } else {
+          console.log("armazenado");
+        }
         return;
       }
-      if (this.findField(this.isBomb, location)) {
+      if (findField(isBomb.value, location)) {
         alert("KABOOM");
         window.location.reload();
       } else {
-        !this.findField(this.isClicked, location)
-          ? this.isClicked.push(location)
-          : console.log("armazenado");
+        if (!findField(isClicked.value, location)) {
+          isClicked.value.push(location);
+        } else {
+          console.log("armazenado");
+        }
       }
-    },
-    showNearBombs(location) {
-      if (this.markBanner) {
+    };
+
+    const showNearBombs = (location) => {
+      if (markBanner) {
         return "!";
       }
-      const nearFields = [];
-      let nearBombs = 0;
-
-      nearFields.push(
+      const nearFields = [
         { x: location.x, y: location.y + 1 },
         { x: location.x + 1, y: location.y + 1 },
         { x: location.x + 1, y: location.y },
@@ -60,19 +61,33 @@ export default {
         { x: location.x, y: location.y - 1 },
         { x: location.x - 1, y: location.y - 1 },
         { x: location.x - 1, y: location.y },
-        { x: location.x - 1, y: location.y + 1 }
-      );
+        { x: location.x - 1, y: location.y + 1 },
+      ];
+      let nearBombs = 0;
       nearFields.forEach((el) => {
-        if (this.findField(this.isBomb, el)) {
+        if (findField(isBomb.value, el)) {
           nearBombs++;
         }
       });
       return nearBombs;
-    },
-  },
-  mounted() {
-    this.randomizeFields();
-    console.log(this.isBomb);
+    };
+
+    const ToggleMarkBanner = () => (markBanner = !markBanner);
+
+    onMounted(() => {
+      randomizeFields();
+      console.log(isBomb.value);
+    });
+
+    return {
+      isBomb,
+      isField,
+      isClicked,
+      findField,
+      clickField,
+      showNearBombs,
+      ToggleMarkBanner,
+    };
   },
 };
 </script>
@@ -80,7 +95,7 @@ export default {
 <template>
   <table>
     <tr>
-      <th @click="markBanner = !markBanner">!</th>
+      <th @click="ToggleMarkBanner()">!</th>
       <th v-for="header in fieldSize" :key="header">{{ header }}</th>
     </tr>
     <tr v-for="line in fieldSize" :key="line">
