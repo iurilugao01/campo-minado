@@ -27,22 +27,20 @@ export default {
     };
 
     const clickField = (location) => {
-      console.log(markBanner.value);
-
       if (markBanner.value) {
-        findField(isBanner.value, location)
-          ? console.log("armazenado")
-          : isBanner.value.push(location);
+        clickBanner(location);
         return;
       }
-
+      if (findField(isBanner.value, location)) return;
       if (findField(isBomb.value, location)) {
         alert("KABOOM");
         window.location.reload();
-      } else if (!findField(isClicked.value, location)) {
+      }
+      if (!findField(isClicked.value, location)) {
         isClicked.value.push(location);
-      } else {
-        console.log("armazenado");
+      }
+      if (isField.value.every((el) => findField(isClicked.value, el))) {
+        alert("Parabens! Você venceu! jogo encerrado");
       }
     };
 
@@ -59,14 +57,22 @@ export default {
       ];
       let nearBombs = 0;
       nearFields.forEach((el) => {
-        if (findField(isBomb.value, el)) {
-          nearBombs++;
-        }
+        if (findField(isBomb.value, el)) nearBombs++;
       });
       return nearBombs;
     };
 
-    const ToggleMarkBanner = () => (markBanner.value = !markBanner.value);
+    const clickBanner = (location) => {
+      if (findField(isClicked.value, location)) return;
+      if (findField(isBanner.value, location)) {
+        const index = isBanner.value.findIndex(
+          (item) => item.x === location.x && item.y === location.y
+        );
+        isBanner.value.splice(index, 1);
+        return;
+      }
+      isBanner.value.push(location);
+    };
 
     onMounted(() => {
       randomizeFields();
@@ -80,7 +86,6 @@ export default {
       findField,
       clickField,
       showNearBombs,
-      ToggleMarkBanner,
       markBanner,
     };
   },
@@ -90,7 +95,7 @@ export default {
 <template>
   <table>
     <tr>
-      <th @click="ToggleMarkBanner()">
+      <th @click="markBanner = !markBanner">
         <i :class="['bi', markBanner ? 'bi-flag-fill' : 'bi-flag']"></i>
       </th>
       <th v-for="header in fieldSize" :key="header">{{ header }}</th>

@@ -10,7 +10,7 @@ export default {
 </script>
 
 <template>
-  <MineField :fieldSize="10"></MineField>
+  <MineField :fieldSize="5"></MineField>
 </template>
 
 <style>
