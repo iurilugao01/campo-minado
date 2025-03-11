@@ -10,13 +10,11 @@ export default {
     const isBomb = ref([]);
     const isField = ref([]);
     const isClicked = ref([]);
-    let markBanner = false;
+    const isBanner = ref([]);
+    let markBanner = ref(false);
 
-    const findField = (array, location) => {
-      return array.some(
-        (field) => field.x === location.x && field.y === location.y
-      );
-    };
+    const findField = (array, location) =>
+      array.some((field) => field.x === location.x && field.y === location.y);
 
     const randomizeFields = () => {
       for (let i = 1; i <= props.fieldSize; i++) {
@@ -29,30 +27,26 @@ export default {
     };
 
     const clickField = (location) => {
-      if (markBanner) {
-        if (!findField(isClicked.value, location)) {
-          isClicked.value.push(location);
-        } else {
-          console.log("armazenado");
-        }
+      console.log(markBanner.value);
+
+      if (markBanner.value) {
+        findField(isBanner.value, location)
+          ? console.log("armazenado")
+          : isBanner.value.push(location);
         return;
       }
+
       if (findField(isBomb.value, location)) {
         alert("KABOOM");
         window.location.reload();
+      } else if (!findField(isClicked.value, location)) {
+        isClicked.value.push(location);
       } else {
-        if (!findField(isClicked.value, location)) {
-          isClicked.value.push(location);
-        } else {
-          console.log("armazenado");
-        }
+        console.log("armazenado");
       }
     };
 
     const showNearBombs = (location) => {
-      if (markBanner) {
-        return "!";
-      }
       const nearFields = [
         { x: location.x, y: location.y + 1 },
         { x: location.x + 1, y: location.y + 1 },
@@ -72,21 +66,22 @@ export default {
       return nearBombs;
     };
 
-    const ToggleMarkBanner = () => (markBanner = !markBanner);
+    const ToggleMarkBanner = () => (markBanner.value = !markBanner.value);
 
     onMounted(() => {
       randomizeFields();
-      console.log(isBomb.value);
     });
 
     return {
       isBomb,
       isField,
       isClicked,
+      isBanner,
       findField,
       clickField,
       showNearBombs,
       ToggleMarkBanner,
+      markBanner,
     };
   },
 };
@@ -95,7 +90,9 @@ export default {
 <template>
   <table>
     <tr>
-      <th @click="ToggleMarkBanner()">!</th>
+      <th @click="ToggleMarkBanner()">
+        <i :class="['bi', markBanner ? 'bi-flag-fill' : 'bi-flag']"></i>
+      </th>
       <th v-for="header in fieldSize" :key="header">{{ header }}</th>
     </tr>
     <tr v-for="line in fieldSize" :key="line">
@@ -107,6 +104,9 @@ export default {
       >
         <span v-if="findField(isClicked, { x: block, y: line })">
           {{ showNearBombs({ x: block, y: line }) }}
+        </span>
+        <span v-if="findField(isBanner, { x: block, y: line })">
+          <i class="bi bi-flag"></i>
         </span>
       </td>
     </tr>
