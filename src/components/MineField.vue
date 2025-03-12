@@ -11,7 +11,9 @@ export default {
     const isField = ref([]);
     const isClicked = ref([]);
     const isBanner = ref([]);
+
     let markBanner = ref(false);
+    let isWinner = ref(false);
 
     const findField = (array, location) =>
       array.some((field) => field.x === location.x && field.y === location.y);
@@ -27,6 +29,7 @@ export default {
     };
 
     const clickField = (location) => {
+      if (isWinner.value) return;
       if (markBanner.value) {
         clickBanner(location);
         return;
@@ -36,11 +39,10 @@ export default {
         alert("KABOOM");
         window.location.reload();
       }
-      if (!findField(isClicked.value, location)) {
-        isClicked.value.push(location);
-      }
+      if (!findField(isClicked.value, location)) isClicked.value.push(location);
       if (isField.value.every((el) => findField(isClicked.value, el))) {
         alert("Parabens! Você venceu! jogo encerrado");
+        isWinner.value = true;
       }
     };
 
@@ -87,6 +89,7 @@ export default {
       clickField,
       showNearBombs,
       markBanner,
+      isWinner,
     };
   },
 };
